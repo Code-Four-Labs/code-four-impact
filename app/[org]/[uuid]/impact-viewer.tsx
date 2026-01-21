@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,8 +11,20 @@ import ColorBends from '@/app/components/ColorBends';
 import { ImpactReportData } from '@/lib/services/gcs-impact.service';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import confetti from 'canvas-confetti';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Dynamically import Three.js components (client-side only)
+const ReportsWireframe = dynamic(
+  () => import('@/app/components/WireframeCube').then(mod => mod.ReportsWireframe),
+  { ssr: false, loading: () => <div className="w-full h-full bg-transparent" /> }
+);
+
+const TimeWireframe = dynamic(
+  () => import('@/app/components/WireframeCube').then(mod => mod.TimeWireframe),
+  { ssr: false, loading: () => <div className="w-full h-full bg-transparent" /> }
+);
 
 interface ImpactViewerProps {
   data: ImpactReportData;
@@ -59,15 +72,23 @@ function getLeaderboardStyles(index: number) {
   return { item: 'leaderboard-item--default', rank: 'leaderboard-rank--default' };
 }
 
-// Animated section divider line component - clean animation from center outward
-// Hidden when scrolled past navbar (top: 56px)
-function SectionDividerLine({ isVisible, position = 'top' }: { isVisible: boolean; position?: 'top' | 'bottom' }) {
+// Static section divider line - once animated, stays visible (doesn't re-animate on scroll up)
+function SectionDividerLine({ shouldAnimate, position = 'top' }: { shouldAnimate: boolean; position?: 'top' | 'bottom' }) {
+  const [hasAnimated, setHasAnimated] = useState(false);
+  
+  useEffect(() => {
+    if (shouldAnimate && !hasAnimated) {
+      setHasAnimated(true);
+    }
+  }, [shouldAnimate, hasAnimated]);
+  
+  const isVisible = hasAnimated;
+  
   return (
     <div 
       className={`absolute ${position === 'top' ? 'top-0' : 'bottom-0'} left-6 right-6 h-[2px] overflow-hidden`}
-      style={{ clipPath: 'inset(0 0 0 0)' }} // Ensures proper clipping within section
+      style={{ clipPath: 'inset(0 0 0 0)' }}
     >
-      {/* Single animated line - expands from center */}
       <div 
         className="absolute left-1/2 top-0 h-full bg-white/30 transition-all duration-1000 ease-out"
         style={{ 
@@ -79,11 +100,34 @@ function SectionDividerLine({ isVisible, position = 'top' }: { isVisible: boolea
   );
 }
 
+// Animated vertical divider - connects to top/bottom horizontal dividers, spans full section height
+function VerticalDivider({ shouldAnimate }: { shouldAnimate: boolean }) {
+  const [hasAnimated, setHasAnimated] = useState(false);
+  
+  useEffect(() => {
+    if (shouldAnimate && !hasAnimated) {
+      setHasAnimated(true);
+    }
+  }, [shouldAnimate, hasAnimated]);
+  
+  const isVisible = hasAnimated;
+  
+  return (
+    <div className="w-[2px] self-stretch relative overflow-hidden" style={{ marginTop: '-3rem', marginBottom: '-3rem' }}>
+      <div 
+        className="absolute top-0 left-0 w-full bg-white/30 transition-all duration-1000 ease-out"
+        style={{ 
+          height: isVisible ? '100%' : '0%',
+        }}
+      />
+    </div>
+  );
+}
+
 // Fixed header line under navbar - animates in on load
 function NavbarLine({ isVisible }: { isVisible: boolean }) {
   return (
     <div className="fixed left-6 right-6 z-40 pointer-events-none h-[2px]" style={{ top: '72px' }}>
-      {/* Single animated line - expands from center */}
       <div 
         className="absolute left-1/2 top-0 h-full bg-white/25 transition-all duration-1000 ease-out"
         style={{ 
@@ -93,6 +137,39 @@ function NavbarLine({ isVisible }: { isVisible: boolean }) {
       />
     </div>
   );
+}
+
+// Confetti effect for the winner
+function triggerConfetti() {
+  const colors = ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#9370DB', '#32CD32'];
+  
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6, x: 0.5 },
+    colors: colors,
+  });
+  
+  // Second burst
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0.3, y: 0.6 },
+      colors: colors,
+    });
+  }, 200);
+  
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 0.7, y: 0.6 },
+      colors: colors,
+    });
+  }, 400);
 }
 
 function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon: number; count: number }> }) {
@@ -227,13 +304,30 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
   const mainContainer = useRef<HTMLDivElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
   const [colorBendsOpacity, setColorBendsOpacity] = useState(1);
-  const [sectionProgress, setSectionProgress] = useState([0, 0, 0, 0, 0]);
   const [navbarLineVisible, setNavbarLineVisible] = useState(false);
+  const confettiTriggered = useRef(false);
+  const leaderboardRef = useRef<HTMLDivElement>(null);
 
   // Animate navbar line on mount
   useEffect(() => {
     const timer = setTimeout(() => setNavbarLineVisible(true), 300);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Confetti effect for leaderboard winner
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !confettiTriggered.current) {
+          confettiTriggered.current = true;
+          setTimeout(() => triggerConfetti(), 500);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (leaderboardRef.current) observer.observe(leaderboardRef.current);
+    return () => observer.disconnect();
   }, []);
 
   const report = data.metadata.report;
@@ -256,20 +350,6 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         onEnterBack: () => {
           setCurrentSection(i);
           setColorBendsOpacity(i === 0 ? 1 : 0);
-        },
-      });
-
-      // Progress tracking for animated lines
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top bottom',
-        end: 'bottom top',
-        onUpdate: (self) => {
-          setSectionProgress(prev => {
-            const newProgress = [...prev];
-            newProgress[i] = self.progress;
-            return newProgress;
-          });
         },
       });
     });
@@ -297,13 +377,12 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
   return (
     <div ref={mainContainer} className="min-h-screen bg-black relative">
-      {/* Fixed Navbar - Transparent or solid black based on scroll */}
-      {/* The navbar covers the full height including the line below it to hide scrolling dividers */}
+      {/* Fixed Navbar */}
       <nav 
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
           colorBendsOpacity === 0 ? 'bg-black' : 'bg-transparent'
         }`}
-        style={{ height: '74px' }} // Covers past the navbar line at 72px
+        style={{ height: '74px' }}
       >
         <div className="px-6 pt-6 pb-3 flex items-center justify-between">
           <Link href="https://codefour.us" className="flex items-center gap-2">
@@ -334,7 +413,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         </div>
       </nav>
 
-      {/* Fixed line under navbar - animated */}
+      {/* Fixed line under navbar */}
       <NavbarLine isVisible={navbarLineVisible} />
 
       {/* Fixed Background - ColorBends */}
@@ -370,7 +449,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 1: Home / Trial Recap */}
       <section className="impact-section pt-24 relative overflow-hidden">
-        <SectionDividerLine isVisible={currentSection >= 1} position="bottom" />
+        <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
         <div className="section-content text-center">
           <div className="mb-6">
             <span className="section-label !mb-0">{report.orgName}</span>
@@ -395,85 +474,123 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         </div>
       </section>
 
-      {/* Section 2: Reports Generated */}
+      {/* Section 2: Reports Generated - Split Layout */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine isVisible={currentSection >= 2} position="top" />
-        <SectionDividerLine isVisible={currentSection >= 2} position="bottom" />
-        <div className="section-content text-center">
-          <span className="section-label">Reports Generated</span>
-
-          <div className="mb-8">
-            <span className="stat-number">
-              <AnimatedCounter value={report.reportsGenerated} />
-            </span>
-          </div>
-
-          <p className="section-description">
-            Among <span className="text-white font-medium">{report.activeUsers} officers</span>, each contributing an average of{' '}
-            <span className="text-white font-medium">{avgReportsPerOfficer} reports</span> during your trial period.
-          </p>
-
-          <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-medium text-white mb-2">
-                <AnimatedCounter value={report.activeUsers} />
+        <SectionDividerLine shouldAnimate={currentSection >= 1} position="top" />
+        <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
+        <div className="section-content">
+          <div className="flex items-stretch min-h-[70vh] max-w-7xl mx-auto px-4">
+            {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
+            <div className="flex-1 flex items-center justify-center pr-16">
+              <div className="w-full max-w-md h-[400px]">
+                <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
+                  <ReportsWireframe />
+                </Suspense>
               </div>
-              <p className="text-white/40 text-sm uppercase">Across Officers</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-medium text-white mb-2">
-                <AnimatedCounter value={report.avgWordLength} />
+            
+            {/* Vertical Divider - animate earlier, connect to top/bottom */}
+            <VerticalDivider shouldAnimate={currentSection >= 1} />
+            
+            {/* Right side - Stats (right-aligned with more spacing from divider) */}
+            <div className="flex-1 flex items-center justify-end pl-16">
+              <div className="text-right max-w-lg">
+                <span className="section-label inline-block">Reports Generated</span>
+
+                <div className="mb-8">
+                  <span className="stat-number">
+                    <AnimatedCounter value={report.reportsGenerated} />
+                  </span>
+                </div>
+
+                <p className="section-description text-right max-w-md ml-auto">
+                  Among <span className="text-white font-medium">{report.activeUsers} officers</span>, each contributing an average of{' '}
+                  <span className="text-white font-medium">{avgReportsPerOfficer} reports</span> during your trial period.
+                </p>
+
+                <div className="mt-12 grid grid-cols-3 gap-6">
+                  <div className="text-right">
+                    <div className="text-3xl font-medium text-white mb-2">
+                      <AnimatedCounter value={report.activeUsers} />
+                    </div>
+                    <p className="text-white/40 text-sm uppercase">Across Officers</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-medium text-white mb-2">
+                      <AnimatedCounter value={report.avgWordLength} />
+                    </div>
+                    <p className="text-white/40 text-sm uppercase">Avg Word Count</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-medium text-white mb-2">{report.avgIncidentLength}</div>
+                    <p className="text-white/40 text-sm uppercase">Avg Length</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-white/40 text-sm uppercase">Average Word Count</p>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-medium text-white mb-2">{report.avgIncidentLength}</div>
-              <p className="text-white/40 text-sm uppercase">Average Incident Length</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 3: Time Saved */}
+      {/* Section 3: Time Saved - Split Layout (reversed) */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine isVisible={currentSection >= 3} position="top" />
-        <SectionDividerLine isVisible={currentSection >= 3} position="bottom" />
-        <div className="section-content text-center">
-          <span className="section-label">Time Saved</span>
+        <SectionDividerLine shouldAnimate={currentSection >= 2} position="top" />
+        <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
+        <div className="section-content">
+          <div className="flex items-stretch min-h-[70vh] max-w-7xl mx-auto px-4">
+            {/* Left side - Stats (left-aligned with more spacing from divider) */}
+            <div className="flex-1 flex items-center justify-start pr-16">
+              <div className="text-left max-w-lg">
+                <span className="section-label inline-block">Time Saved</span>
 
-          <div className="mb-4">
-            <span className="stat-number">
-              <AnimatedCounter value={timeSavedHours} />
-            </span>
-            <span className="text-4xl md:text-6xl font-bold text-white/60 ml-4">hours</span>
-          </div>
+                <div className="mb-4">
+                  <span className="stat-number">
+                    <AnimatedCounter value={timeSavedHours} />
+                  </span>
+                  <span className="text-4xl md:text-6xl font-bold text-white/60 ml-4">hours</span>
+                </div>
 
-          <p className="section-subtitle">
-            Based on {report.minutesProcessed.toLocaleString()} minutes of footage processed
-          </p>
+                <p className="section-subtitle text-left">
+                  Based on {report.minutesProcessed.toLocaleString()} minutes of footage processed
+                </p>
 
-          <p className="section-description">
-            That&apos;s roughly <span className="text-white font-medium">{Math.round(timeSavedHours / 8)} full work days</span> your officers can spend back in the community.
-          </p>
+                <p className="section-description text-left max-w-md">
+                  That&apos;s roughly <span className="text-white font-medium">{Math.round(timeSavedHours / 8)} full work days</span> your officers can spend back in the community.
+                </p>
 
-          <div className="mt-12 flex items-center justify-center gap-4 flex-wrap">
-            <div className="stat-box">
-              <div className="text-2xl font-medium text-white mb-1">
-                {report.minutesProcessed.toLocaleString()}
+                <div className="mt-12 flex items-center gap-4 flex-wrap">
+                  <div className="stat-box">
+                    <div className="text-2xl font-medium text-white mb-1">
+                      {report.minutesProcessed.toLocaleString()}
+                    </div>
+                    <p className="text-white/40 text-xs uppercase">Minutes Processed</p>
+                  </div>
+                  <div className="text-white/40 text-2xl">×</div>
+                  <div className="stat-box">
+                    <div className="text-2xl font-medium text-white mb-1">0.25</div>
+                    <p className="text-white/40 text-xs uppercase">Time Multiplier</p>
+                  </div>
+                  <div className="text-white/40 text-2xl">=</div>
+                  <div className="stat-box--highlight">
+                    <div className="text-2xl font-medium text-white mb-1">
+                      {timeSavedMinutes.toLocaleString()} min
+                    </div>
+                    <p className="text-white/40 text-xs uppercase">Time Saved</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-white/40 text-xs uppercase">Minutes Processed</p>
             </div>
-            <div className="text-white/40 text-2xl">×</div>
-            <div className="stat-box">
-              <div className="text-2xl font-medium text-white mb-1">0.25</div>
-              <p className="text-white/40 text-xs uppercase">Time Multiplier</p>
-            </div>
-            <div className="text-white/40 text-2xl">=</div>
-            <div className="stat-box--highlight">
-              <div className="text-2xl font-medium text-white mb-1">
-                {timeSavedMinutes.toLocaleString()} min
+            
+            {/* Vertical Divider - animate earlier, connect to top/bottom */}
+            <VerticalDivider shouldAnimate={currentSection >= 2} />
+            
+            {/* Right side - Three.js Wireframe (Time visualization - hourglass) */}
+            <div className="flex-1 flex items-center justify-center pl-16">
+              <div className="w-full max-w-md h-[400px]">
+                <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
+                  <TimeWireframe />
+                </Suspense>
               </div>
-              <p className="text-white/40 text-xs uppercase">Time Saved</p>
             </div>
           </div>
         </div>
@@ -481,8 +598,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 4: Report Locations Map */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine isVisible={currentSection >= 4} position="top" />
-        <SectionDividerLine isVisible={currentSection >= 4} position="bottom" />
+        <SectionDividerLine shouldAnimate={currentSection >= 4} position="top" />
+        <SectionDividerLine shouldAnimate={currentSection >= 4} position="bottom" />
         <div className="section-content">
           <div className="text-center mb-8">
             <span className="section-label">Report Locations</span>
@@ -524,7 +641,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
             </p>
           </div>
 
-          <div className="max-w-xl mx-auto">
+          <div ref={leaderboardRef} className="max-w-xl mx-auto">
             <h3 className="text-white/60 text-sm uppercase tracking-wider mb-4 text-center">
               Top Contributors
             </h3>
@@ -533,7 +650,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
               {report.leaderboard.map((user, index) => {
                 const styles = getLeaderboardStyles(index);
                 return (
-                  <div key={user.name} className={`leaderboard-item ${styles.item}`}>
+                  <div key={user.name} className={`leaderboard-item ${styles.item} ${index === 0 ? 'relative' : ''}`}>
                     <div className={`leaderboard-rank ${styles.rank}`}>#{user.rank}</div>
                     <div className="flex-1">
                       <div className="text-white font-medium">{user.name}</div>
