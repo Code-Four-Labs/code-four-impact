@@ -195,21 +195,59 @@ function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon
 
     mapboxgl.accessToken = token;
 
-    const avgLat = locations.reduce((sum, loc) => sum + loc.lat, 0) / locations.length;
-    const avgLon = locations.reduce((sum, loc) => sum + loc.lon, 0) / locations.length;
+    // Calculate bounds from all location points
+    const lats = locations.map(loc => loc.lat);
+    const lons = locations.map(loc => loc.lon);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLon = Math.min(...lons);
+    const maxLon = Math.max(...lons);
+    
+    // Calculate center
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLon = (minLon + maxLon) / 2;
+    
+    // Calculate span for zoom determination
+    const latSpan = maxLat - minLat;
+    const lonSpan = maxLon - minLon;
+    const maxSpan = Math.max(latSpan, lonSpan);
+    
+    // Determine zoom level based on data spread
+    // If data is tightly clustered (small span), zoom in more
+    let initialZoom = 12; // Default for tightly clustered data
+    if (maxSpan > 0.1) initialZoom = 11;
+    if (maxSpan > 0.2) initialZoom = 10;
+    if (maxSpan > 0.5) initialZoom = 9;
+    if (maxSpan > 1) initialZoom = 8;
+    if (maxSpan > 2) initialZoom = 7;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: [avgLon, avgLat],
-      zoom: 6.5,
+      center: [centerLon, centerLat],
+      zoom: initialZoom,
       interactive: false,
     });
 
     map.current.on('load', () => {
       if (!map.current) return;
+      
+      // Fit bounds for precise positioning if we have spread data
+      if (locations.length > 1 && maxSpan > 0.001) {
+        const bounds = new mapboxgl.LngLatBounds();
+        locations.forEach(loc => {
+          bounds.extend([loc.lon, loc.lat]);
+        });
+        
+        map.current.fitBounds(bounds, {
+          padding: { top: 60, bottom: 60, left: 60, right: 60 },
+          maxZoom: 14,
+          duration: 0
+        });
+      }
 
-      const size = 100;
+      // Pulsing dot marker - subtle and slow
+      const size = 80;
       const pulsingDot = {
         width: size,
         height: size,
@@ -221,25 +259,30 @@ function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon
           this.context = canvas.getContext('2d');
         },
         render: function () {
-          const duration = 1500;
+          // Slower pulse (3 seconds instead of 1.5)
+          const duration = 3000;
           const t = (performance.now() % duration) / duration;
-          const radius = (size / 2) * 0.3;
-          const outerRadius = (size / 2) * 0.7 * t + radius;
+          // Smaller inner radius
+          const radius = (size / 2) * 0.25;
+          // Smaller outer expansion (0.4 instead of 0.7)
+          const outerRadius = (size / 2) * 0.4 * t + radius;
           const context = this.context;
           if (!context) return false;
 
           context.clearRect(0, 0, this.width, this.height);
 
+          // Outer pulsing ring - more subtle opacity
           context.beginPath();
           context.arc(this.width / 2, this.height / 2, outerRadius, 0, Math.PI * 2);
-          context.fillStyle = `rgba(0, 75, 156, ${1 - t})`;
+          context.fillStyle = `rgba(0, 75, 156, ${0.4 * (1 - t)})`; // Max 40% opacity instead of 100%
           context.fill();
 
+          // Inner solid dot
           context.beginPath();
           context.arc(this.width / 2, this.height / 2, radius, 0, Math.PI * 2);
-          context.fillStyle = '#003165';
-          context.strokeStyle = '#004B9C';
-          context.lineWidth = 2 + 4 * (1 - t);
+          context.fillStyle = '#004B9C';
+          context.strokeStyle = '#0066CC';
+          context.lineWidth = 2;
           context.fill();
           context.stroke();
 

@@ -11,9 +11,9 @@ RUN npm ci
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Build-time arguments for NEXT_PUBLIC_ env vars (required for client-side code)
-ARG NEXT_PUBLIC_MAPBOX_TOKEN
-ENV NEXT_PUBLIC_MAPBOX_TOKEN=$NEXT_PUBLIC_MAPBOX_TOKEN
+# NEXT_PUBLIC_ env vars must be set at build time for Next.js to inline them
+# These are safe to expose as they are public keys
+ENV NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ1IjoiZHlsYW5uMjUiLCJhIjoiY203NXpiY3hiMDFmYjJrb3ZtZGthM2JrOCJ9.s9MOjhoCK3EaUp9IOpyCbw
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
