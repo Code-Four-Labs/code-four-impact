@@ -136,7 +136,7 @@ function NavbarLine({ isVisible }: { isVisible: boolean }) {
   return (
     <div className="fixed left-6 right-6 z-40 pointer-events-none h-[2px]" style={{ top: '72px' }}>
       <div 
-        className="absolute left-1/2 top-0 h-full bg-white/25 transition-all duration-1000 ease-out"
+        className="absolute left-1/2 top-0 h-full bg-white/30 transition-all duration-1000 ease-out"
         style={{ 
           width: isVisible ? '100%' : '0%',
           transform: 'translateX(-50%)',
