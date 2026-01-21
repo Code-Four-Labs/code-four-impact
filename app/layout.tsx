@@ -11,28 +11,28 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: "Code Four Impact",
-  description: "Tomorrow's police tech delivered today.",
+  title: "Code Four Recap",
+  description: "Your trial period, recapped. See the impact Code Four made for your department.",
   icons: {
     icon: '/codefour/branding/favicon.png',
   },
   openGraph: {
-    title: "Code Four Impact",
-    description: "The AI Law Enforcement Copilot for a Better Tomorrow. Delivered Today.",
+    title: "Code Four Recap",
+    description: "Your trial period, recapped. See the impact Code Four made for your department.",
     images: [
       {
         url: '/codefour/branding/code-four-link-preview.png',
         width: 1200,
         height: 630,
-        alt: 'Code Four Labs Corp.',
+        alt: 'Code Four Recap - Your Trial Period Results',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Code Four Impact",
-    description: "The AI Law Enforcement Copilot for a Better Tomorrow. Delivered Today.",
+    title: "Code Four Recap",
+    description: "Your trial period, recapped. See the impact Code Four made for your department.",
     images: ['/codefour/branding/code-four-link-preview.png'],
   },
 };
