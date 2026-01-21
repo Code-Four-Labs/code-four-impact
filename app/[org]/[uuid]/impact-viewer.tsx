@@ -456,6 +456,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 1: Home / Trial Recap */}
       <section className="impact-section pt-24 relative overflow-hidden">
+        {/* Bottom divider animates when entering Section 2 */}
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
         <div className="section-content text-center">
           <div className="mb-6">
@@ -483,8 +484,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 2: Reports Generated - Split Layout */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine shouldAnimate={currentSection >= 1} position="top" />
-        <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
+        {/* Bottom divider animates when entering Section 3 */}
+        <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
         <div className="section-content !max-w-none w-full">
           <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
@@ -541,8 +542,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 3: Time Saved - Split Layout (reversed) */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine shouldAnimate={currentSection >= 2} position="top" />
-        <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
+        {/* Bottom divider animates when entering Section 4 */}
+        <SectionDividerLine shouldAnimate={currentSection >= 3} position="bottom" />
         <div className="section-content !max-w-none w-full">
           <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Stats (left-aligned, with responsive spacing) */}
@@ -605,7 +606,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 4: Report Locations Map */}
       <section className="impact-section bg-black relative overflow-hidden">
-        <SectionDividerLine shouldAnimate={currentSection >= 4} position="top" />
+        {/* Bottom divider animates when entering Section 5 */}
         <SectionDividerLine shouldAnimate={currentSection >= 4} position="bottom" />
         <div className="section-content">
           <div className="text-center mb-8">
@@ -633,7 +634,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Section 5: Active Users & Leaderboard */}
       <section className="impact-section pb-24 pt-16 bg-black relative overflow-hidden">
-        <SectionDividerLine shouldAnimate={currentSection >= 4} position="top" />
+        {/* No top divider - Section 4's bottom serves as the boundary */}
         <div className="section-content">
           <div className="text-center mb-12 mt-8">
             <span className="section-label">Active Users</span>
