@@ -2,10 +2,12 @@
 # Builds and deploys the impact report app to Cloud Run
 
 steps:
-  # Step 1: Build Docker image
+  # Step 1: Build Docker image (with build args for NEXT_PUBLIC_ env vars)
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_MAPBOX_TOKEN=${_MAPBOX_TOKEN}'
       - '-t'
       - 'gcr.io/$PROJECT_ID/code-four-impact:$SHORT_SHA'
       - '-t'
