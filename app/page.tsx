@@ -114,18 +114,18 @@ export default function ImpactPage() {
 
   return (
     <div ref={mainContainer} className="min-h-screen bg-black relative">
-      {/* Fixed Background - ColorBends with visible brand colors */}
+      {/* Fixed Background - Code Four landing theme: deep navy blues */}
       <div className="fixed inset-0 z-0">
         <ColorBends
-          colors={["#0066CC", "#004B9C", "#1a8cff", "#003366"]}
-          rotation={0}
-          speed={0.2}
-          scale={1}
-          frequency={1}
-          warpStrength={1}
-          mouseInfluence={1}
-          parallax={0.5}
-          noise={0.1}
+          colors={["#001A36", "#004B9C", "#000810", "#002855"]}
+          rotation={45}
+          speed={0.1}
+          scale={1.5}
+          frequency={0.6}
+          warpStrength={0.6}
+          mouseInfluence={0.3}
+          parallax={0.2}
+          noise={0.08}
           transparent={false}
           autoRotate={0}
         />
