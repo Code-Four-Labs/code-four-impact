@@ -486,9 +486,9 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="top" />
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
         <div className="section-content !max-w-none w-full">
-          <div className="flex items-stretch min-h-[70vh] w-full">
+          <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
-            <div className="flex-1 flex items-center justify-start pl-12 pr-8">
+            <div className="flex-1 flex items-center justify-center pl-8 md:pl-16 lg:pl-24 pr-8">
               <div className="w-full max-w-lg h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <ReportsWireframe />
@@ -499,8 +499,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
             {/* Vertical Divider - animate with small delay after horizontal lines */}
             <VerticalDivider shouldAnimate={currentSection >= 1} delay={300} />
             
-            {/* Right side - Stats (right-aligned, closer to right edge) */}
-            <div className="flex-1 flex items-center justify-end pl-8 pr-12">
+            {/* Right side - Stats (right-aligned, with responsive spacing) */}
+            <div className="flex-1 flex items-center justify-center pl-8 pr-8 md:pr-16 lg:pr-24">
               <div className="text-right max-w-lg">
                 <span className="section-label inline-block">Reports Generated</span>
 
@@ -544,9 +544,9 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         <SectionDividerLine shouldAnimate={currentSection >= 2} position="top" />
         <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
         <div className="section-content !max-w-none w-full">
-          <div className="flex items-stretch min-h-[70vh] w-full">
-            {/* Left side - Stats (left-aligned, closer to left edge) */}
-            <div className="flex-1 flex items-center justify-start pl-12 pr-8">
+          <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
+            {/* Left side - Stats (left-aligned, with responsive spacing) */}
+            <div className="flex-1 flex items-center justify-center pl-8 md:pl-16 lg:pl-24 pr-8">
               <div className="text-left max-w-lg">
                 <span className="section-label inline-block">Time Saved</span>
 
@@ -592,7 +592,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
             <VerticalDivider shouldAnimate={currentSection >= 2} delay={300} />
             
             {/* Right side - Three.js Wireframe (Time visualization - hourglass) */}
-            <div className="flex-1 flex items-center justify-end pl-8 pr-12">
+            <div className="flex-1 flex items-center justify-center pl-8 pr-8 md:pr-16 lg:pr-24">
               <div className="w-full max-w-lg h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <TimeWireframe />
@@ -632,9 +632,10 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       </section>
 
       {/* Section 5: Active Users & Leaderboard */}
-      <section className="impact-section pb-24 bg-black relative overflow-hidden">
+      <section className="impact-section pb-24 pt-16 bg-black relative overflow-hidden">
+        <SectionDividerLine shouldAnimate={currentSection >= 4} position="top" />
         <div className="section-content">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 mt-8">
             <span className="section-label">Active Users</span>
 
             <div className="mb-8">
@@ -674,17 +675,30 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
           <div className="mt-16 text-center">
             <p className="text-white/60 mb-6">Ready to continue the momentum?</p>
-            <a
-              href="https://cal.com/codefour"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              Start Your Subscription
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://cal.com/codefour"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
+              >
+                Schedule a Call
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+              <button
+                onClick={() => window.print()}
+                className="btn-secondary"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Report
+              </button>
+            </div>
           </div>
         </div>
       </section>
