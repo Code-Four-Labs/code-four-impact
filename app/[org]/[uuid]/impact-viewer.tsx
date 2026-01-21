@@ -705,7 +705,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
 
       {/* Footer */}
       <footer className="impact-footer">
-        <div className="footer-divider mx-6 mb-8" />
+        <div className="h-[2px] bg-white/30 mx-6 mb-8" />
         <div className="max-w-4xl mx-auto px-6 flex items-center justify-center">
           <p className="text-white/40 text-sm">
             © 2026 Code Four Labs, Corp.

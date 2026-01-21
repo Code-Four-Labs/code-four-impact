@@ -181,9 +181,3 @@ body {
 .impact-footer {
   @apply relative z-10 py-8;
 }
-
-/* Consistent divider line - 2px height, 30% opacity (matches section dividers) */
-.footer-divider {
-  height: 2px;
-  background-color: rgba(255, 255, 255, 0.3);
-}
