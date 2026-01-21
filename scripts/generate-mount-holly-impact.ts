@@ -21,7 +21,7 @@ const CONFIG = {
   projectId: 'dev-25-01',
   bigQueryDataset: 'code_four_backend_logs',
   bigQueryTable: 'media_processing_jobs',
-  gcsBucket: 'c4-prod-storage',
+  gcsBucket: 'c4-impact',
   
   // Report parameters
   orgSlug: 'mount-holly-police-department',
@@ -213,7 +213,7 @@ async function main() {
   console.log('\n☁️ Uploading to GCS...');
 
   const uuid = crypto.randomUUID();
-  const gcsPath = `impact-reports/${CONFIG.orgSlug}/${uuid}/impact-report.json`;
+  const gcsPath = `${CONFIG.orgSlug}/${uuid}/impact-report.json`;
   
   const bucket = storage.bucket(CONFIG.gcsBucket);
   const file = bucket.file(gcsPath);
