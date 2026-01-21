@@ -4,11 +4,11 @@ import { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// Reports visualization - top-down view of papers scattered on desk with pencil
+// Reports visualization - top-down view of papers scattered on desk
 function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{ x: number; y: number }> }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  // Create papers on desk (top-down view) with pencil
+  // Create papers on desk (top-down view)
   const { positions, linePositions } = useMemo(() => {
     const points: number[] = [];
     const lines: number[] = [];
@@ -29,6 +29,8 @@ function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{
       { angle: -0.2, z: 0.05, offsetX: -0.1, offsetY: 0.05 }, // Middle paper - slight left angle
       { angle: 0.25, z: 0.1, offsetX: 0.15, offsetY: -0.08 }, // Top paper - right angle
     ];
+    
+    const isTopPaper = (index: number) => index === papers.length - 1;
     
     papers.forEach((paper, paperIndex) => {
       const { angle, z, offsetX, offsetY } = paper;
@@ -59,25 +61,25 @@ function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{
         );
       }
       
-      // Add "text" lines on each document (horizontal lines representing text)
-      const numTextLines = 4;
-      const margin = 0.2;
-      for (let l = 0; l < numTextLines; l++) {
-        const yPos = -docHeight/2 + margin + (l * (docHeight - margin * 2) / (numTextLines));
-        const lineStartX = -docWidth/2 + margin;
-        const lineEndX = docWidth/2 - margin - (l % 2 === 0 ? 0 : 0.3); // Varying line lengths
+      // Only add "text" lines on the top paper (correct perspective)
+      if (isTopPaper(paperIndex)) {
+        const numTextLines = 4;
+        const margin = 0.2;
+        for (let l = 0; l < numTextLines; l++) {
+          const yPos = -docHeight/2 + margin + (l * (docHeight - margin * 2) / (numTextLines));
+          const lineStartX = -docWidth/2 + margin;
+          const lineEndX = docWidth/2 - margin - (l % 2 === 0 ? 0 : 0.3); // Varying line lengths
+          
+          const [sx, sy] = rotatePoint(lineStartX, yPos, angle);
+          const [ex, ey] = rotatePoint(lineEndX, yPos, angle);
+          
+          lines.push(
+            sx + offsetX, sy + offsetY, z + 0.01,
+            ex + offsetX, ey + offsetY, z + 0.01
+          );
+        }
         
-        const [sx, sy] = rotatePoint(lineStartX, yPos, angle);
-        const [ex, ey] = rotatePoint(lineEndX, yPos, angle);
-        
-        lines.push(
-          sx + offsetX, sy + offsetY, z + 0.01,
-          ex + offsetX, ey + offsetY, z + 0.01
-        );
-      }
-      
-      // Add more points along edges for visual density (only on top paper)
-      if (paperIndex === papers.length - 1) {
+        // Add more points along edges for visual density (only on top paper)
         for (let i = 0; i < 4; i++) {
           const next = (i + 1) % 4;
           const midX = (corners[i][0] + corners[next][0]) / 2;
@@ -86,72 +88,6 @@ function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{
         }
       }
     });
-    
-    // Add pencil on top (diagonal across the papers)
-    const pencilLength = 2.2;
-    const pencilAngle = 0.6; // Roughly 35 degrees
-    const pencilZ = 0.15;
-    const pencilOffsetX = 0.3;
-    const pencilOffsetY = 0.2;
-    
-    // Pencil body (main line)
-    const [pencilStartX, pencilStartY] = rotatePoint(-pencilLength/2, 0, pencilAngle);
-    const [pencilEndX, pencilEndY] = rotatePoint(pencilLength/2, 0, pencilAngle);
-    
-    lines.push(
-      pencilStartX + pencilOffsetX, pencilStartY + pencilOffsetY, pencilZ,
-      pencilEndX + pencilOffsetX, pencilEndY + pencilOffsetY, pencilZ
-    );
-    
-    // Pencil tip (small triangle at one end)
-    const tipLength = 0.15;
-    const tipWidth = 0.06;
-    const [tipX, tipY] = rotatePoint(pencilLength/2 + tipLength, 0, pencilAngle);
-    const [tip1X, tip1Y] = rotatePoint(pencilLength/2, tipWidth, pencilAngle);
-    const [tip2X, tip2Y] = rotatePoint(pencilLength/2, -tipWidth, pencilAngle);
-    
-    lines.push(
-      pencilEndX + pencilOffsetX, pencilEndY + pencilOffsetY, pencilZ,
-      tipX + pencilOffsetX, tipY + pencilOffsetY, pencilZ
-    );
-    lines.push(
-      tip1X + pencilOffsetX, tip1Y + pencilOffsetY, pencilZ,
-      tipX + pencilOffsetX, tipY + pencilOffsetY, pencilZ
-    );
-    lines.push(
-      tip2X + pencilOffsetX, tip2Y + pencilOffsetY, pencilZ,
-      tipX + pencilOffsetX, tipY + pencilOffsetY, pencilZ
-    );
-    
-    // Eraser end (small rectangle at other end)
-    const eraserLength = 0.12;
-    const eraserWidth = 0.05;
-    const [eraser1X, eraser1Y] = rotatePoint(-pencilLength/2, eraserWidth, pencilAngle);
-    const [eraser2X, eraser2Y] = rotatePoint(-pencilLength/2, -eraserWidth, pencilAngle);
-    const [eraser3X, eraser3Y] = rotatePoint(-pencilLength/2 - eraserLength, eraserWidth, pencilAngle);
-    const [eraser4X, eraser4Y] = rotatePoint(-pencilLength/2 - eraserLength, -eraserWidth, pencilAngle);
-    
-    lines.push(
-      eraser1X + pencilOffsetX, eraser1Y + pencilOffsetY, pencilZ,
-      eraser2X + pencilOffsetX, eraser2Y + pencilOffsetY, pencilZ
-    );
-    lines.push(
-      eraser3X + pencilOffsetX, eraser3Y + pencilOffsetY, pencilZ,
-      eraser4X + pencilOffsetX, eraser4Y + pencilOffsetY, pencilZ
-    );
-    lines.push(
-      eraser1X + pencilOffsetX, eraser1Y + pencilOffsetY, pencilZ,
-      eraser3X + pencilOffsetX, eraser3Y + pencilOffsetY, pencilZ
-    );
-    lines.push(
-      eraser2X + pencilOffsetX, eraser2Y + pencilOffsetY, pencilZ,
-      eraser4X + pencilOffsetX, eraser4Y + pencilOffsetY, pencilZ
-    );
-    
-    // Add points for pencil
-    points.push(pencilStartX + pencilOffsetX, pencilStartY + pencilOffsetY, pencilZ);
-    points.push(pencilEndX + pencilOffsetX, pencilEndY + pencilOffsetY, pencilZ);
-    points.push(tipX + pencilOffsetX, tipY + pencilOffsetY, pencilZ);
     
     return {
       positions: new Float32Array(points),
