@@ -1,19 +1,36 @@
 @import "tailwindcss";
 
+/* ===== CSS Variables ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --c4-blue-primary: #004B9C;
+  --c4-blue-light: #0066CC;
+  --c4-blue-bright: #1a8cff;
+  --c4-blue-dark: #001A36;
+  --c4-navy: #002855;
+  
+  /* UI Colors */
+  --background: #000000;
+  --foreground: #ffffff;
   --black: #000;
   --white: #fff;
+  
+  /* Opacity variants */
+  --white-80: rgba(255, 255, 255, 0.8);
+  --white-60: rgba(255, 255, 255, 0.6);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --white-30: rgba(255, 255, 255, 0.3);
+  --white-20: rgba(255, 255, 255, 0.2);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-05: rgba(255, 255, 255, 0.05);
+  
+  /* Leaderboard colors */
+  --gold: #EAB308;
+  --silver: #9CA3AF;
+  --bronze: #EA580C;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ===== Base Styles ===== */
 @font-face {
   font-family: 'Space Grotesk';
   font-style: normal;
@@ -30,18 +47,133 @@ body {
   overscroll-behavior: none;
 }
 
-.disable-pointer {
-  pointer-events: none !important;
+/* ===== Impact Page Styles ===== */
+
+/* Sections */
+.impact-section {
+  @apply min-h-screen flex items-center justify-center relative z-10 px-6;
 }
 
-.burger__btn.active .line-1 {
-  transform: rotate(45deg);
+.section-content {
+  @apply max-w-4xl w-full;
 }
 
-.burger__btn.active .line-2 {
-  opacity: 0;
+/* Labels / Badges */
+.section-label {
+  @apply inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider mb-8;
 }
 
-.burger__btn.active .line-3 {
-  transform: rotate(-45deg);
+/* Large Numbers */
+.stat-number {
+  @apply text-8xl md:text-[12rem] font-bold text-white leading-none;
+}
+
+.stat-number-sm {
+  @apply text-8xl md:text-[10rem] font-bold text-white leading-none;
+}
+
+/* Descriptions */
+.section-description {
+  @apply text-white/60 text-xl max-w-xl mx-auto;
+}
+
+.section-subtitle {
+  @apply text-white/40 text-lg mb-8;
+}
+
+/* Progress Indicator */
+.progress-dot {
+  @apply w-2 h-2 rounded-full transition-all duration-300;
+}
+
+.progress-dot--active {
+  @apply bg-white scale-150;
+}
+
+.progress-dot--inactive {
+  @apply bg-white/30;
+}
+
+/* Cards / Boxes */
+.stat-box {
+  @apply px-6 py-4 border border-white/10 bg-white/5;
+}
+
+.stat-box--highlight {
+  @apply px-6 py-4 border border-white/20 bg-white/10;
+}
+
+/* Leaderboard */
+.leaderboard-item {
+  @apply flex items-center gap-4 p-4 border transition-all;
+}
+
+.leaderboard-item--gold {
+  @apply border-yellow-500/50 bg-yellow-500/10;
+}
+
+.leaderboard-item--silver {
+  @apply border-gray-400/50 bg-gray-400/10;
+}
+
+.leaderboard-item--bronze {
+  @apply border-orange-600/50 bg-orange-600/10;
+}
+
+.leaderboard-item--default {
+  @apply border-white/10 bg-white/5;
+}
+
+.leaderboard-rank {
+  @apply w-8 h-8 flex items-center justify-center font-bold;
+}
+
+.leaderboard-rank--gold {
+  @apply text-yellow-500;
+}
+
+.leaderboard-rank--silver {
+  @apply text-gray-400;
+}
+
+.leaderboard-rank--bronze {
+  @apply text-orange-600;
+}
+
+.leaderboard-rank--default {
+  @apply text-white/40;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-medium uppercase tracking-wider hover:bg-white/90 transition-all;
+}
+
+/* Title styles */
+.impact-title {
+  @apply text-5xl md:text-7xl font-medium text-white uppercase tracking-tight mb-6;
+}
+
+.impact-subtitle {
+  @apply text-white/80;
+}
+
+/* Animations */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.scroll-indicator {
+  @apply flex items-center justify-center gap-2 text-white/40;
+  animation: bounce 2s infinite;
+}
+
+/* Footer */
+.impact-footer {
+  @apply relative z-10 py-8 border-t border-white/10;
 }

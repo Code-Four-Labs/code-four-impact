@@ -65,6 +65,14 @@ function AnimatedCounter({ value, duration = 2, suffix = '' }: { value: number, 
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
+// Helper to get leaderboard styles
+function getLeaderboardStyles(index: number) {
+  if (index === 0) return { item: 'leaderboard-item--gold', rank: 'leaderboard-rank--gold' };
+  if (index === 1) return { item: 'leaderboard-item--silver', rank: 'leaderboard-rank--silver' };
+  if (index === 2) return { item: 'leaderboard-item--bronze', rank: 'leaderboard-rank--bronze' };
+  return { item: 'leaderboard-item--default', rank: 'leaderboard-rank--default' };
+}
+
 export default function ImpactPage() {
   const mainContainer = useRef<HTMLDivElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
@@ -106,19 +114,20 @@ export default function ImpactPage() {
 
   return (
     <div ref={mainContainer} className="min-h-screen bg-black relative">
-      {/* Fixed Background - Code Four brand colors: deep blues and blacks */}
+      {/* Fixed Background - ColorBends with visible brand colors */}
       <div className="fixed inset-0 z-0">
         <ColorBends
-          colors={["#001A36", "#004B9C", "#000810", "#002855"]}
-          rotation={45}
-          speed={0.1}
-          scale={1.5}
-          frequency={0.6}
-          warpStrength={0.6}
-          mouseInfluence={0.3}
-          parallax={0.2}
-          noise={0.08}
+          colors={["#0066CC", "#004B9C", "#1a8cff", "#003366"]}
+          rotation={0}
+          speed={0.2}
+          scale={1}
+          frequency={1}
+          warpStrength={1}
+          mouseInfluence={1}
+          parallax={0.5}
+          noise={0.1}
           transparent={false}
+          autoRotate={0}
         />
       </div>
 
@@ -127,16 +136,14 @@ export default function ImpactPage() {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              currentSection === i ? 'bg-white scale-150' : 'bg-white/30'
-            }`}
+            className={`progress-dot ${currentSection === i ? 'progress-dot--active' : 'progress-dot--inactive'}`}
           />
         ))}
       </div>
 
       {/* Section 1: Home / Trial Recap */}
-      <section className="impact-section min-h-screen flex items-center justify-center relative z-10 px-6">
-        <div className="section-content max-w-4xl w-full text-center">
+      <section className="impact-section">
+        <div className="section-content text-center">
           {/* Logo */}
           <div className="mb-8">
             <Link href="/">
@@ -151,22 +158,20 @@ export default function ImpactPage() {
           </div>
 
           <div className="mb-6">
-            <span className="inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider">
-              {impactData.orgName}
-            </span>
+            <span className="section-label !mb-0">{impactData.orgName}</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-medium text-white uppercase tracking-tight mb-6">
+          <h1 className="impact-title">
             Your Trial Period
             <br />
-            <span className="text-white/80">Recapped</span>
+            <span className="impact-subtitle">Recapped</span>
           </h1>
 
           <p className="text-white/60 text-lg mb-8">
             {impactData.trialPeriod}
           </p>
 
-          <div className="flex items-center justify-center gap-2 text-white/40 animate-bounce">
+          <div className="scroll-indicator">
             <span className="text-sm uppercase tracking-wider">Scroll to explore</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 5v14M19 12l-7 7-7-7"/>
@@ -176,19 +181,17 @@ export default function ImpactPage() {
       </section>
 
       {/* Section 2: Reports Generated */}
-      <section className="impact-section min-h-screen flex items-center justify-center relative z-10 px-6">
-        <div className="section-content max-w-4xl w-full text-center">
-          <span className="inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider mb-8">
-            Reports Generated
-          </span>
+      <section className="impact-section">
+        <div className="section-content text-center">
+          <span className="section-label">Reports Generated</span>
 
           <div className="mb-8">
-            <span className="text-8xl md:text-[12rem] font-bold text-white leading-none">
+            <span className="stat-number">
               <AnimatedCounter value={impactData.reportsGenerated} />
             </span>
           </div>
 
-          <p className="text-white/60 text-xl max-w-xl mx-auto">
+          <p className="section-description">
             AI-powered reports created during your trial, each one saving approximately 30 minutes of manual documentation.
           </p>
 
@@ -200,15 +203,11 @@ export default function ImpactPage() {
               <p className="text-white/40 text-sm uppercase">Accuracy Rate</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-medium text-white mb-2">
-                &lt;2min
-              </div>
+              <div className="text-3xl font-medium text-white mb-2">&lt;2min</div>
               <p className="text-white/40 text-sm uppercase">Avg Processing</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-medium text-white mb-2">
-                24/7
-              </div>
+              <div className="text-3xl font-medium text-white mb-2">24/7</div>
               <p className="text-white/40 text-sm uppercase">Availability</p>
             </div>
           </div>
@@ -216,43 +215,39 @@ export default function ImpactPage() {
       </section>
 
       {/* Section 3: Time Saved */}
-      <section className="impact-section min-h-screen flex items-center justify-center relative z-10 px-6">
-        <div className="section-content max-w-4xl w-full text-center">
-          <span className="inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider mb-8">
-            Time Saved
-          </span>
+      <section className="impact-section">
+        <div className="section-content text-center">
+          <span className="section-label">Time Saved</span>
 
           <div className="mb-4">
-            <span className="text-8xl md:text-[12rem] font-bold text-white leading-none">
+            <span className="stat-number">
               <AnimatedCounter value={timeSavedHours} />
             </span>
             <span className="text-4xl md:text-6xl font-bold text-white/60 ml-4">hours</span>
           </div>
 
-          <p className="text-white/40 text-lg mb-8">
+          <p className="section-subtitle">
             Based on {impactData.minutesProcessed.toLocaleString()} minutes of footage processed
           </p>
 
-          <p className="text-white/60 text-xl max-w-xl mx-auto">
+          <p className="section-description">
             That&apos;s roughly <span className="text-white font-medium">{Math.round(timeSavedHours / 8)} full work days</span> your officers can spend back in the community.
           </p>
 
-          <div className="mt-12 flex items-center justify-center gap-4">
-            <div className="px-6 py-4 border border-white/10 bg-white/5">
+          <div className="mt-12 flex items-center justify-center gap-4 flex-wrap">
+            <div className="stat-box">
               <div className="text-2xl font-medium text-white mb-1">
                 {impactData.minutesProcessed.toLocaleString()}
               </div>
               <p className="text-white/40 text-xs uppercase">Minutes Processed</p>
             </div>
             <div className="text-white/40 text-2xl">×</div>
-            <div className="px-6 py-4 border border-white/10 bg-white/5">
-              <div className="text-2xl font-medium text-white mb-1">
-                0.25
-              </div>
+            <div className="stat-box">
+              <div className="text-2xl font-medium text-white mb-1">0.25</div>
               <p className="text-white/40 text-xs uppercase">Time Multiplier</p>
             </div>
             <div className="text-white/40 text-2xl">=</div>
-            <div className="px-6 py-4 border border-white/20 bg-white/10">
+            <div className="stat-box--highlight">
               <div className="text-2xl font-medium text-white mb-1">
                 {timeSavedMinutes.toLocaleString()} min
               </div>
@@ -263,20 +258,18 @@ export default function ImpactPage() {
       </section>
 
       {/* Section 4: Active Users & Leaderboard */}
-      <section className="impact-section min-h-screen flex items-center justify-center relative z-10 px-6 pb-24">
-        <div className="section-content max-w-4xl w-full">
+      <section className="impact-section pb-24">
+        <div className="section-content">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider mb-8">
-              Active Users
-            </span>
+            <span className="section-label">Active Users</span>
 
             <div className="mb-8">
-              <span className="text-8xl md:text-[10rem] font-bold text-white leading-none">
+              <span className="stat-number-sm">
                 <AnimatedCounter value={impactData.activeUsers} />
               </span>
             </div>
 
-            <p className="text-white/60 text-xl">
+            <p className="section-description !mb-0">
               Officers using Code Four during your trial
             </p>
           </div>
@@ -288,33 +281,21 @@ export default function ImpactPage() {
             </h3>
 
             <div className="space-y-3">
-              {impactData.leaderboard.map((user, index) => (
-                <div
-                  key={user.name}
-                  className={`flex items-center gap-4 p-4 border transition-all ${
-                    index === 0
-                      ? 'border-yellow-500/50 bg-yellow-500/10'
-                      : index === 1
-                      ? 'border-gray-400/50 bg-gray-400/10'
-                      : index === 2
-                      ? 'border-orange-600/50 bg-orange-600/10'
-                      : 'border-white/10 bg-white/5'
-                  }`}
-                >
-                  <div className={`w-8 h-8 flex items-center justify-center font-bold ${
-                    index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-orange-600' : 'text-white/40'
-                  }`}>
-                    #{user.rank}
+              {impactData.leaderboard.map((user, index) => {
+                const styles = getLeaderboardStyles(index);
+                return (
+                  <div key={user.name} className={`leaderboard-item ${styles.item}`}>
+                    <div className={`leaderboard-rank ${styles.rank}`}>#{user.rank}</div>
+                    <div className="flex-1">
+                      <div className="text-white font-medium">{user.name}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-bold text-xl">{user.reports}</div>
+                      <div className="text-white/40 text-xs uppercase">Reports</div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="text-white font-medium">{user.name}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-white font-bold text-xl">{user.reports}</div>
-                    <div className="text-white/40 text-xs uppercase">Reports</div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -325,7 +306,7 @@ export default function ImpactPage() {
               href="https://cal.com/codefour"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-medium uppercase tracking-wider hover:bg-white/90 transition-all"
+              className="btn-primary"
             >
               Start Your Subscription
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -337,7 +318,7 @@ export default function ImpactPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 border-t border-white/10">
+      <footer className="impact-footer">
         <div className="max-w-4xl mx-auto px-6 flex items-center justify-between">
           <Link href="/">
             <Image
