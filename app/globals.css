@@ -65,11 +65,11 @@ body {
 
 /* Large Numbers */
 .stat-number {
-  @apply text-8xl md:text-[12rem] font-bold text-white leading-none;
+  @apply text-6xl md:text-[8rem] font-bold text-white leading-none;
 }
 
 .stat-number-sm {
-  @apply text-8xl md:text-[10rem] font-bold text-white leading-none;
+  @apply text-6xl md:text-[7rem] font-bold text-white leading-none;
 }
 
 /* Descriptions */

@@ -72,8 +72,8 @@ function getLeaderboardStyles(index: number) {
   return { item: 'leaderboard-item--default', rank: 'leaderboard-rank--default' };
 }
 
-// Static section divider line - once animated, stays visible (doesn't re-animate on scroll up)
-function SectionDividerLine({ shouldAnimate, position = 'top' }: { shouldAnimate: boolean; position?: 'top' | 'bottom' }) {
+// Custom hook for one-time animation trigger
+function useOneTimeAnimation(shouldAnimate: boolean) {
   const [hasAnimated, setHasAnimated] = useState(false);
   
   useEffect(() => {
@@ -82,7 +82,12 @@ function SectionDividerLine({ shouldAnimate, position = 'top' }: { shouldAnimate
     }
   }, [shouldAnimate, hasAnimated]);
   
-  const isVisible = hasAnimated;
+  return hasAnimated;
+}
+
+// Static section divider line - once animated, stays visible (doesn't re-animate on scroll up)
+function SectionDividerLine({ shouldAnimate, position = 'top' }: { shouldAnimate: boolean; position?: 'top' | 'bottom' }) {
+  const isVisible = useOneTimeAnimation(shouldAnimate);
   
   return (
     <div 
@@ -101,19 +106,21 @@ function SectionDividerLine({ shouldAnimate, position = 'top' }: { shouldAnimate
 }
 
 // Animated vertical divider - connects to top/bottom horizontal dividers, spans full section height
-function VerticalDivider({ shouldAnimate }: { shouldAnimate: boolean }) {
-  const [hasAnimated, setHasAnimated] = useState(false);
+function VerticalDivider({ shouldAnimate, delay = 0 }: { shouldAnimate: boolean; delay?: number }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const hasTriggered = useRef(false);
   
   useEffect(() => {
-    if (shouldAnimate && !hasAnimated) {
-      setHasAnimated(true);
+    if (shouldAnimate && !hasTriggered.current) {
+      hasTriggered.current = true;
+      // Delay vertical line slightly after horizontal lines start
+      const timer = setTimeout(() => setIsVisible(true), delay);
+      return () => clearTimeout(timer);
     }
-  }, [shouldAnimate, hasAnimated]);
-  
-  const isVisible = hasAnimated;
+  }, [shouldAnimate, delay]);
   
   return (
-    <div className="w-[2px] self-stretch relative overflow-hidden" style={{ marginTop: '-3rem', marginBottom: '-3rem' }}>
+    <div className="w-[2px] self-stretch relative overflow-hidden flex-shrink-0" style={{ marginTop: '-3rem', marginBottom: '-3rem' }}>
       <div 
         className="absolute top-0 left-0 w-full bg-white/30 transition-all duration-1000 ease-out"
         style={{ 
@@ -478,22 +485,22 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       <section className="impact-section bg-black relative overflow-hidden">
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="top" />
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
-        <div className="section-content">
-          <div className="flex items-stretch min-h-[70vh] max-w-7xl mx-auto px-4">
+        <div className="section-content !max-w-none w-full">
+          <div className="flex items-stretch min-h-[70vh] w-full">
             {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
-            <div className="flex-1 flex items-center justify-center pr-16">
-              <div className="w-full max-w-md h-[400px]">
+            <div className="flex-1 flex items-center justify-start pl-12 pr-8">
+              <div className="w-full max-w-lg h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <ReportsWireframe />
                 </Suspense>
               </div>
             </div>
             
-            {/* Vertical Divider - animate earlier, connect to top/bottom */}
-            <VerticalDivider shouldAnimate={currentSection >= 1} />
+            {/* Vertical Divider - animate with small delay after horizontal lines */}
+            <VerticalDivider shouldAnimate={currentSection >= 1} delay={300} />
             
-            {/* Right side - Stats (right-aligned with more spacing from divider) */}
-            <div className="flex-1 flex items-center justify-end pl-16">
+            {/* Right side - Stats (right-aligned, closer to right edge) */}
+            <div className="flex-1 flex items-center justify-end pl-8 pr-12">
               <div className="text-right max-w-lg">
                 <span className="section-label inline-block">Reports Generated</span>
 
@@ -536,10 +543,10 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       <section className="impact-section bg-black relative overflow-hidden">
         <SectionDividerLine shouldAnimate={currentSection >= 2} position="top" />
         <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
-        <div className="section-content">
-          <div className="flex items-stretch min-h-[70vh] max-w-7xl mx-auto px-4">
-            {/* Left side - Stats (left-aligned with more spacing from divider) */}
-            <div className="flex-1 flex items-center justify-start pr-16">
+        <div className="section-content !max-w-none w-full">
+          <div className="flex items-stretch min-h-[70vh] w-full">
+            {/* Left side - Stats (left-aligned, closer to left edge) */}
+            <div className="flex-1 flex items-center justify-start pl-12 pr-8">
               <div className="text-left max-w-lg">
                 <span className="section-label inline-block">Time Saved</span>
 
@@ -581,12 +588,12 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
               </div>
             </div>
             
-            {/* Vertical Divider - animate earlier, connect to top/bottom */}
-            <VerticalDivider shouldAnimate={currentSection >= 2} />
+            {/* Vertical Divider - animate with small delay after horizontal lines */}
+            <VerticalDivider shouldAnimate={currentSection >= 2} delay={300} />
             
             {/* Right side - Three.js Wireframe (Time visualization - hourglass) */}
-            <div className="flex-1 flex items-center justify-center pl-16">
-              <div className="w-full max-w-md h-[400px]">
+            <div className="flex-1 flex items-center justify-end pl-8 pr-12">
+              <div className="w-full max-w-lg h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <TimeWireframe />
                 </Suspense>
