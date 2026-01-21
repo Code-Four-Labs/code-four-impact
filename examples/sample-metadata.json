@@ -1,0 +1,33 @@
+{
+  "uuid": "01234567-89ab-cdef-0123-456789abcdef",
+  "org_slug": "spanish-fork-pd",
+  "password_hash": "$2a$10$N9qo8uLOickgx2ZMRZoMy.MmyRSJrN3Dl9kG7dRpBiJNIqPgdvZTy",
+  "created_at": "2026-01-01T00:00:00Z",
+  "expires_at": null,
+  "report": {
+    "orgName": "Spanish Fork Police Department",
+    "trialPeriod": "Jan 1 - Jan 31, 2026",
+    "reportsGenerated": 247,
+    "minutesProcessed": 18420,
+    "activeUsers": 12,
+    "avgWordLength": 1842,
+    "avgIncidentLength": "12:34",
+    "leaderboard": [
+      { "name": "Officer Johnson", "reports": 45, "rank": 1 },
+      { "name": "Officer Smith", "reports": 38, "rank": 2 },
+      { "name": "Officer Davis", "reports": 34, "rank": 3 },
+      { "name": "Officer Wilson", "reports": 28, "rank": 4 },
+      { "name": "Officer Martinez", "reports": 25, "rank": 5 }
+    ],
+    "reportLocations": [
+      { "lat": 40.2338, "lon": -111.6585, "count": 45 },
+      { "lat": 40.7608, "lon": -111.8910, "count": 82 },
+      { "lat": 40.6461, "lon": -111.4980, "count": 28 },
+      { "lat": 41.2230, "lon": -111.9738, "count": 35 },
+      { "lat": 40.3916, "lon": -111.8508, "count": 22 },
+      { "lat": 40.5649, "lon": -111.9390, "count": 18 },
+      { "lat": 39.5296, "lon": -111.5004, "count": 12 },
+      { "lat": 37.1041, "lon": -113.5841, "count": 5 }
+    ]
+  }
+}
