@@ -799,24 +799,20 @@ export default function Home() {
             <div className='max-w-[1280px] w-full mx-auto flex items-center justify-end relative z-10'>
               <div className='w-full lg:w-[60%] h-[100vh] flex justify-end items-start lg:items-center'>
                 <div className={`w-full h-[238px] md:h-auto aspect-[1920/1202] flex items-center justify-center relative max-md:top-[10%] max-lg:top-[5%] overflow-hidden border bg-black lg:bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.1)_100%)] shadow-[0_4px_250px_0_rgba(255,255,255,0.10)] transition-all duration-700 ease-out ${ourProductSelectedIndex === 0 ? 'border-[rgba(255,255,255,0.15)] scale-[0.98]' : 'border-[rgba(255,255,255,0.20)] scale-100'}`}>
-                  <video
-                    src='/codefour/products/introducing-code-four.mp4'
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload='auto'
-                    poster='/codefour/products/report-hero.png'
+                  <Image
+                    src='/codefour/hero/carousel-02.png'
+                    width={1920}
+                    height={1202}
+                    quality={100}
+                    alt='Code Four Report'
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${ourProductSelectedIndex === 0 ? 'opacity-100' : 'opacity-0'}`}
                   />
-                  <video
-                    src='/codefour/products/codefourredaction.mp4'
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload='auto'
-                    poster='/codefour/products/redaction-hero.png'
+                  <Image
+                    src='/codefour/hero/carousel-02.png'
+                    width={1920}
+                    height={1202}
+                    quality={100}
+                    alt='Code Four Redactions'
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${ourProductSelectedIndex === 1 ? 'opacity-100' : 'opacity-0'}`}
                   />
 
