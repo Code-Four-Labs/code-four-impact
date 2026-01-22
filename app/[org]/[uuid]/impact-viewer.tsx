@@ -17,12 +17,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Dynamically import Three.js components (client-side only)
 const ReportsWireframe = dynamic(
-  () => import('@/app/components/WireframeCube').then(mod => mod.ReportsWireframe),
+  () => import('@/app/components/WireframeVisualizations').then(mod => mod.ReportsWireframe),
   { ssr: false, loading: () => <div className="w-full h-full bg-transparent" /> }
 );
 
 const TimeWireframe = dynamic(
-  () => import('@/app/components/WireframeCube').then(mod => mod.TimeWireframe),
+  () => import('@/app/components/WireframeVisualizations').then(mod => mod.TimeWireframe),
   { ssr: false, loading: () => <div className="w-full h-full bg-transparent" /> }
 );
 
