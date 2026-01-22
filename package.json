@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run lint && next build",
     "start": "next start",
-    "lint": "eslint",
-    "generate:mount-holly": "npx ts-node --skipProject scripts/generate-mount-holly-impact.ts"
+    "lint": "eslint --max-warnings 0"
   },
   "dependencies": {
     "@google-cloud/firestore": "^8.2.0",
@@ -28,8 +27,6 @@
     "three": "^0.182.0"
   },
   "devDependencies": {
-    "@google-cloud/bigquery": "^8.1.1",
-    "@google-cloud/storage": "^7.18.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

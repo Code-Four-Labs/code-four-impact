@@ -73,14 +73,16 @@ function getLeaderboardStyles(index: number) {
 }
 
 // Custom hook for one-time animation trigger
+// Uses "adjusting state during render" pattern from React docs
+// https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
 function useOneTimeAnimation(shouldAnimate: boolean) {
   const [hasAnimated, setHasAnimated] = useState(false);
   
-  useEffect(() => {
-    if (shouldAnimate && !hasAnimated) {
-      setHasAnimated(true);
-    }
-  }, [shouldAnimate, hasAnimated]);
+  // ✅ Good: Adjust state during rendering (React approved pattern)
+  // React will immediately re-render with updated state, avoiding cascading effects
+  if (shouldAnimate && !hasAnimated) {
+    setHasAnimated(true);
+  }
   
   return hasAnimated;
 }

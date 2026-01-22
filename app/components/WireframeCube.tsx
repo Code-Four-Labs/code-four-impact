@@ -136,6 +136,13 @@ function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{
   );
 }
 
+// Simple seeded pseudo-random for deterministic results (idempotent)
+// Uses sine-based hash - same seed always produces same output
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
 // Time visualization - hourglass shape
 function HourglassVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{ x: number; y: number }> }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -197,15 +204,15 @@ function HourglassVisualization({ mouseRef }: { mouseRef: React.MutableRefObject
       }
     }
     
-    // Add "sand" particles falling through
+    // Add "sand" particles falling through (deterministic positions)
     const sandParticles = 8;
     for (let p = 0; p < sandParticles; p++) {
       const y = (p / sandParticles - 0.5) * height * 0.6;
       const spread = Math.abs(y) < 0.2 ? 0.05 : 0.15;
       points.push(
-        (Math.random() - 0.5) * spread,
+        (seededRandom(p * 2) - 0.5) * spread,
         y,
-        (Math.random() - 0.5) * spread
+        (seededRandom(p * 2 + 1) - 0.5) * spread
       );
     }
     

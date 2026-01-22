@@ -238,6 +238,7 @@ export default function ColorBends({
         container.removeChild(renderer.domElement);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally runs once on mount to initialize Three.js scene; prop updates handled by separate effect below
   }, []);
 
   useEffect(() => {
