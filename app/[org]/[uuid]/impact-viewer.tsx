@@ -535,7 +535,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         <div className="section-content !max-w-none w-full">
           <div className="flex flex-col lg:flex-row items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
-            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-2 lg:order-1">
+            {/* Mobile: order-3 (last), Desktop: order-1 (first) */}
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-3 lg:order-1">
               <div className="w-full max-w-lg h-[280px] sm:h-[350px] lg:h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <ReportsWireframe />
@@ -543,17 +544,19 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
               </div>
             </div>
             
-            {/* Vertical Divider - hidden on mobile, visible on desktop */}
-            <div className="hidden lg:block">
+            {/* Vertical Divider - hidden on mobile, visible on desktop (order-2 in middle) */}
+            <div className="hidden lg:flex self-stretch lg:order-2">
               <VerticalDivider shouldAnimate={currentSection >= 1} delay={300} />
             </div>
             
-            {/* Horizontal divider for mobile */}
-            <div className="lg:hidden w-full px-6 order-2">
-              <div className="h-[2px] bg-white/20 w-full" />
+            {/* Horizontal divider for mobile - between stats and wireframe */}
+            {/* Mobile: order-2 (middle), Hidden on desktop */}
+            <div className="lg:hidden w-full px-6 order-2 py-4">
+              <div className="h-[2px] bg-white/30 w-full" />
             </div>
             
             {/* Right side - Stats (centered on mobile, right-aligned on desktop) */}
+            {/* Mobile: order-1 (first), Desktop: order-3 (last) */}
             <div className="flex-1 flex items-center justify-center px-6 lg:pl-8 lg:pr-16 py-8 lg:py-0 order-1 lg:order-3">
               <div className="text-center lg:text-right max-w-lg w-full">
                 <span className="section-label inline-block">Reports Generated</span>
@@ -600,7 +603,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         <div className="section-content !max-w-none w-full">
           <div className="flex flex-col lg:flex-row items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Stats (centered on mobile, left-aligned on desktop) */}
-            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-1">
+            {/* Mobile: order-1 (first), Desktop: order-1 (first) */}
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-1 lg:order-1">
               <div className="text-center lg:text-left max-w-lg w-full">
                 <span className="section-label inline-block">Time Saved</span>
 
@@ -643,18 +647,20 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
               </div>
             </div>
             
-            {/* Vertical Divider - hidden on mobile, visible on desktop */}
-            <div className="hidden lg:block">
+            {/* Vertical Divider - hidden on mobile, visible on desktop (order-2 in middle) */}
+            <div className="hidden lg:flex self-stretch lg:order-2">
               <VerticalDivider shouldAnimate={currentSection >= 2} delay={300} />
             </div>
             
-            {/* Horizontal divider for mobile */}
-            <div className="lg:hidden w-full px-6 order-2">
-              <div className="h-[2px] bg-white/20 w-full" />
+            {/* Horizontal divider for mobile - between stats and wireframe */}
+            {/* Mobile: order-2 (middle), Hidden on desktop */}
+            <div className="lg:hidden w-full px-6 order-2 py-4">
+              <div className="h-[2px] bg-white/30 w-full" />
             </div>
             
             {/* Right side - Three.js Wireframe (Time visualization - hourglass) */}
-            <div className="flex-1 flex items-center justify-center px-6 lg:pl-8 lg:pr-16 py-8 lg:py-0 order-3">
+            {/* Mobile: order-3 (last), Desktop: order-3 (last) */}
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-8 lg:pr-16 py-8 lg:py-0 order-3 lg:order-3">
               <div className="w-full max-w-lg h-[280px] sm:h-[350px] lg:h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <TimeWireframe />
