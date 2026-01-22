@@ -58,27 +58,27 @@ body {
   @apply max-w-4xl w-full;
 }
 
-/* Labels / Badges */
+/* Labels / Badges - responsive sizing */
 .section-label {
-  @apply inline-block px-4 py-2 border border-white/20 text-white/60 text-sm uppercase tracking-wider mb-8;
+  @apply inline-block px-3 sm:px-4 py-1.5 sm:py-2 border border-white/20 text-white/60 text-xs sm:text-sm uppercase tracking-wider mb-6 sm:mb-8;
 }
 
-/* Large Numbers */
+/* Large Numbers - responsive sizing */
 .stat-number {
-  @apply text-6xl md:text-[8rem] font-bold text-white leading-none;
+  @apply text-5xl sm:text-6xl md:text-[8rem] font-bold text-white leading-none;
 }
 
 .stat-number-sm {
-  @apply text-6xl md:text-[7rem] font-bold text-white leading-none;
+  @apply text-5xl sm:text-6xl md:text-[7rem] font-bold text-white leading-none;
 }
 
-/* Descriptions */
+/* Descriptions - responsive sizing */
 .section-description {
-  @apply text-white/60 text-xl max-w-xl mx-auto;
+  @apply text-white/60 text-base sm:text-lg lg:text-xl max-w-xl mx-auto;
 }
 
 .section-subtitle {
-  @apply text-white/40 text-lg mb-8;
+  @apply text-white/40 text-base sm:text-lg mb-6 sm:mb-8;
 }
 
 /* Progress Indicator */
@@ -94,18 +94,18 @@ body {
   @apply bg-white/30;
 }
 
-/* Cards / Boxes */
+/* Cards / Boxes - responsive sizing */
 .stat-box {
-  @apply px-6 py-4 border border-white/10 bg-white/5;
+  @apply px-4 sm:px-6 py-3 sm:py-4 border border-white/10 bg-white/5;
 }
 
 .stat-box--highlight {
-  @apply px-6 py-4 border border-white/20 bg-white/10;
+  @apply px-4 sm:px-6 py-3 sm:py-4 border border-white/20 bg-white/10;
 }
 
-/* Leaderboard */
+/* Leaderboard - responsive sizing */
 .leaderboard-item {
-  @apply flex items-center gap-4 p-4 border transition-all;
+  @apply flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border transition-all;
 }
 
 .leaderboard-item--gold {
@@ -144,18 +144,18 @@ body {
   @apply text-white/40;
 }
 
-/* Buttons */
+/* Buttons - responsive sizing */
 .btn-primary {
-  @apply inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-medium uppercase tracking-wider hover:bg-white/90 transition-all;
+  @apply inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white text-black font-medium uppercase tracking-wider hover:bg-white/90 transition-all text-sm sm:text-base;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center gap-2 px-8 py-4 bg-transparent text-white font-medium uppercase tracking-wider border border-white/30 hover:bg-white/10 hover:border-white/50 transition-all;
+  @apply inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-transparent text-white font-medium uppercase tracking-wider border border-white/30 hover:bg-white/10 hover:border-white/50 transition-all text-sm sm:text-base;
 }
 
-/* Title styles */
+/* Title styles - responsive sizing */
 .impact-title {
-  @apply text-5xl md:text-7xl font-medium text-white uppercase tracking-tight mb-6;
+  @apply text-3xl sm:text-5xl md:text-7xl font-medium text-white uppercase tracking-tight mb-4 sm:mb-6;
 }
 
 .impact-subtitle {

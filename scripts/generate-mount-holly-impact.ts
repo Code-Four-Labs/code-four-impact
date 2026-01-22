@@ -37,6 +37,17 @@ const CONFIG = {
   password: 'V1sN6m9wC8eY3KJ2qZbA0Q4F7R5dXkTgLUpM'
 };
 
+// Real officer data from Cognito/Admin console
+const MOUNT_HOLLY_OFFICERS: { [uuid: string]: { name: string; title: string } } = {
+  'e831b288-30c1-7025-2c39-13566c025308': { name: 'Angelo Prince', title: 'Officer' },
+  'b88162a8-60c1-70d1-0b7f-4c540ce26275': { name: 'Brandt Frodham', title: 'Officer' },
+  '48710218-a0f1-700f-a392-650f125ca690': { name: 'Nicholas Dell-Priscoli', title: 'Detective Sergeant' },
+  '582192e8-8011-7089-aa60-7d4b9035483e': { name: 'Eugene Simpson', title: 'Detective' },
+  '081152c8-10e1-7079-225e-3c6546a2efd5': { name: 'Frank Shaw', title: 'Officer' },
+  'd86192d8-4091-70e4-2443-49c784c6aa71': { name: 'Matthew Egler', title: 'Sergeant' },
+  'a861a298-f041-7055-78b3-fe11f222d6cf': { name: 'Thomas Fenton', title: 'Detective' },
+};
+
 interface BigQueryRow {
   [key: string]: any;
 }
@@ -210,36 +221,97 @@ async function main() {
   console.log(`   ✓ Average Word Count: ${avgWordCount}`);
 
   // =========================================================
-  // Query 4: Leaderboard (Top 5 users by report count)
+  // Query 4: Leaderboard from Firestore (counting reports by accessible_by)
+  // One document = One report, count by user UUID in accessible_by array
   // =========================================================
-  console.log('\n🏆 Querying leaderboard...');
+  console.log('\n🏆 Building leaderboard from Firestore (accessible_by field)...');
   
-  const leaderboardQuery = `
-    SELECT
-      user_uuid,
-      COUNT(*) as report_count
-    FROM \`${CONFIG.projectId}.${CONFIG.bigQueryDataset}.${CONFIG.bigQueryTable}\`
-    WHERE organization_slug = '${CONFIG.orgSlug}'
-      AND processing_status = 'COMPLETED'
-      AND processing_start_time >= ${startMicros}
-      AND processing_start_time <= ${endMicros}
-    GROUP BY user_uuid
-    ORDER BY report_count DESC
-    LIMIT 5
-  `;
+  // Count reports per user from both databases
+  const userReportCounts: { [uuid: string]: number } = {};
   
-  const leaderboardResult = await runBigQueryQuery(bq, leaderboardQuery);
+  // Count from core database (/reports)
+  console.log('   Counting reports from c4-core...');
+  try {
+    const coreReportsRef = firestoreCore
+      .collection('organizations')
+      .doc(CONFIG.orgSlug)
+      .collection('reports');
+    
+    const coreSnapshot = await coreReportsRef.get();
+    let coreCount = 0;
+    
+    for (const doc of coreSnapshot.docs) {
+      const data = doc.data();
+      const accessibleBy = data?.accessible_by;
+      
+      if (Array.isArray(accessibleBy)) {
+        for (const userId of accessibleBy) {
+          if (typeof userId === 'string' && MOUNT_HOLLY_OFFICERS[userId]) {
+            userReportCounts[userId] = (userReportCounts[userId] || 0) + 1;
+            coreCount++;
+          }
+        }
+      }
+    }
+    console.log(`   ✓ Counted ${coreCount} user-report associations from core DB`);
+  } catch (error: any) {
+    console.log(`   ⚠ Error counting core reports: ${error.message}`);
+  }
   
-  const leaderboard = leaderboardResult.map((row, index) => ({
+  // Count from legacy database (/narratives)
+  console.log('   Counting reports from c4-draft-reports...');
+  try {
+    const legacyNarrativesRef = firestoreLegacy
+      .collection('organizations')
+      .doc(CONFIG.orgSlug)
+      .collection('narratives');
+    
+    const legacySnapshot = await legacyNarrativesRef.get();
+    let legacyCount = 0;
+    
+    for (const doc of legacySnapshot.docs) {
+      const data = doc.data();
+      const accessibleBy = data?.accessible_by;
+      
+      if (Array.isArray(accessibleBy)) {
+        for (const userId of accessibleBy) {
+          if (typeof userId === 'string' && MOUNT_HOLLY_OFFICERS[userId]) {
+            userReportCounts[userId] = (userReportCounts[userId] || 0) + 1;
+            legacyCount++;
+          }
+        }
+      }
+    }
+    console.log(`   ✓ Counted ${legacyCount} user-report associations from legacy DB`);
+  } catch (error: any) {
+    console.log(`   ⚠ Error counting legacy reports: ${error.message}`);
+  }
+  
+  // Build sorted leaderboard with real officer names
+  const leaderboardEntries = Object.entries(userReportCounts)
+    .map(([uuid, reports]) => ({
+      uuid,
+      name: MOUNT_HOLLY_OFFICERS[uuid]?.name || 'Unknown Officer',
+      title: MOUNT_HOLLY_OFFICERS[uuid]?.title || 'Officer',
+      reports
+    }))
+    .sort((a, b) => b.reports - a.reports)
+    .slice(0, 5);
+  
+  const leaderboard = leaderboardEntries.map((entry, index) => ({
     rank: index + 1,
-    name: `Officer ${getOfficerName(row.user_uuid, index)}`,
-    reports: row.report_count
+    name: `${entry.title} ${entry.name.split(' ')[1] || entry.name}`, // Use last name with title
+    reports: entry.reports
   }));
   
   console.log(`   ✓ Found ${leaderboard.length} contributors`);
   leaderboard.forEach(entry => {
     console.log(`      #${entry.rank}: ${entry.name} - ${entry.reports} reports`);
   });
+  
+  // Also calculate total reports from Firestore document count
+  const totalFirestoreReports = Object.values(userReportCounts).reduce((sum, count) => sum + count, 0);
+  console.log(`   ✓ Total reports (Firestore): ${totalFirestoreReports}`);
 
   // =========================================================
   // Query 5: Report Locations (aggregated by lat/lon)

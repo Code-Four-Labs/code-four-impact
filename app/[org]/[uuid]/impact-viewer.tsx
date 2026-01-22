@@ -179,7 +179,7 @@ function triggerConfetti() {
   }, 400);
 }
 
-function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon: number; count: number }> }) {
+function ReportLocationsMapResponsive({ locations }: { locations: Array<{ lat: number; lon: number; count: number }> }) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -335,7 +335,7 @@ function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon
 
   if (mapError || locations.length === 0) {
     return (
-      <div className="w-full h-[400px] rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+      <div className="w-full h-[280px] sm:h-[350px] lg:h-[400px] rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
         <p className="text-white/40 text-sm">{mapError || 'No location data available'}</p>
       </div>
     );
@@ -344,7 +344,7 @@ function ReportLocationsMap({ locations }: { locations: Array<{ lat: number; lon
   return (
     <div 
       ref={mapContainer} 
-      className="w-full h-[400px] rounded-xl overflow-hidden border border-white/10"
+      className="w-full h-[280px] sm:h-[350px] lg:h-[400px] rounded-xl overflow-hidden border border-white/10"
       style={{ background: '#0a0a0a' }}
     />
   );
@@ -434,28 +434,29 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         }`}
         style={{ height: '74px' }}
       >
-        <div className="px-6 pt-6 pb-3 flex items-center justify-between">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 flex items-center justify-between">
           <Link href="https://codefour.us" className="flex items-center gap-2">
             <Image
               src="/codefour/branding/logo.svg"
               width={120}
               height={28}
               alt="Code Four"
-              style={{ width: 'auto', height: 28 }}
+              className="h-6 sm:h-7 w-auto"
+              style={{ width: 'auto' }}
             />
           </Link>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
             <a 
               href="https://app.codefour.us"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/60 hover:text-white text-sm font-medium uppercase tracking-wider transition-colors"
+              className="text-white/60 hover:text-white text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors"
             >
               App
             </a>
             <a 
               href="mailto:founders@codefour.us"
-              className="text-white/60 hover:text-white text-sm font-medium uppercase tracking-wider transition-colors"
+              className="text-white/60 hover:text-white text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors hidden sm:block"
             >
               Contact
             </a>
@@ -487,8 +488,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         />
       </div>
 
-      {/* Progress Indicator */}
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3">
+      {/* Progress Indicator - hidden on mobile, visible on larger screens */}
+      <div className="hidden sm:flex fixed right-4 sm:right-8 top-1/2 -translate-y-1/2 z-50 flex-col gap-3">
         {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
@@ -498,26 +499,26 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       </div>
 
       {/* Section 1: Home / Trial Recap */}
-      <section className="impact-section pt-24 relative overflow-hidden">
+      <section className="impact-section pt-20 sm:pt-24 relative overflow-hidden">
         {/* Bottom divider animates when entering Section 2 */}
         <SectionDividerLine shouldAnimate={currentSection >= 1} position="bottom" />
-        <div className="section-content text-center">
-          <div className="mb-6">
-            <span className="section-label !mb-0">{report.orgName}</span>
+        <div className="section-content text-center px-4 sm:px-6">
+          <div className="mb-4 sm:mb-6">
+            <span className="section-label !mb-0 text-xs sm:text-sm">{report.orgName}</span>
           </div>
 
-          <h1 className="impact-title">
+          <h1 className="impact-title text-3xl sm:text-5xl md:text-7xl">
             Your Trial Period
             <br />
             <span className="impact-subtitle">Recapped</span>
           </h1>
 
-          <p className="text-white/60 text-lg mb-8">
+          <p className="text-white/60 text-base sm:text-lg mb-6 sm:mb-8">
             {report.trialPeriod}
           </p>
 
           <div className="scroll-indicator">
-            <span className="text-sm uppercase tracking-wider">Scroll to explore</span>
+            <span className="text-xs sm:text-sm uppercase tracking-wider">Scroll to explore</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 5v14M19 12l-7 7-7-7"/>
             </svg>
@@ -530,51 +531,58 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         {/* Bottom divider animates when entering Section 3 */}
         <SectionDividerLine shouldAnimate={currentSection >= 2} position="bottom" />
         <div className="section-content !max-w-none w-full">
-          <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
+          <div className="flex flex-col lg:flex-row items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
             {/* Left side - Three.js Wireframe (Reports visualization - stacked documents) */}
-            <div className="flex-1 flex items-center justify-center pl-8 md:pl-16 lg:pl-24 pr-8">
-              <div className="w-full max-w-lg h-[400px]">
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-2 lg:order-1">
+              <div className="w-full max-w-lg h-[280px] sm:h-[350px] lg:h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <ReportsWireframe />
                 </Suspense>
               </div>
             </div>
             
-            {/* Vertical Divider - animate with small delay after horizontal lines */}
-            <VerticalDivider shouldAnimate={currentSection >= 1} delay={300} />
+            {/* Vertical Divider - hidden on mobile, visible on desktop */}
+            <div className="hidden lg:block">
+              <VerticalDivider shouldAnimate={currentSection >= 1} delay={300} />
+            </div>
             
-            {/* Right side - Stats (right-aligned, with responsive spacing) */}
-            <div className="flex-1 flex items-center justify-center pl-8 pr-8 md:pr-16 lg:pr-24">
-              <div className="text-right max-w-lg">
+            {/* Horizontal divider for mobile */}
+            <div className="lg:hidden w-full px-6 order-2">
+              <div className="h-[2px] bg-white/20 w-full" />
+            </div>
+            
+            {/* Right side - Stats (centered on mobile, right-aligned on desktop) */}
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-8 lg:pr-16 py-8 lg:py-0 order-1 lg:order-3">
+              <div className="text-center lg:text-right max-w-lg w-full">
                 <span className="section-label inline-block">Reports Generated</span>
 
-                <div className="mb-8">
+                <div className="mb-6 lg:mb-8">
                   <span className="stat-number">
                     <AnimatedCounter value={report.reportsGenerated} />
                   </span>
                 </div>
 
-                <p className="section-description text-right max-w-md ml-auto">
+                <p className="section-description text-center lg:text-right max-w-md mx-auto lg:ml-auto lg:mr-0">
                   Among <span className="text-white font-medium">{report.activeUsers} officers</span>, each contributing an average of{' '}
                   <span className="text-white font-medium">{avgReportsPerOfficer} reports</span> during your trial period.
                 </p>
 
-                <div className="mt-12 grid grid-cols-3 gap-6">
-                  <div className="text-right">
-                    <div className="text-3xl font-medium text-white mb-2">
+                <div className="mt-8 lg:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                  <div className="text-center lg:text-right">
+                    <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">
                       <AnimatedCounter value={report.activeUsers} />
                     </div>
-                    <p className="text-white/40 text-sm uppercase">Across Officers</p>
+                    <p className="text-white/40 text-xs lg:text-sm uppercase">Across Officers</p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-medium text-white mb-2">
+                  <div className="text-center lg:text-right">
+                    <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">
                       <AnimatedCounter value={report.avgWordLength} />
                     </div>
-                    <p className="text-white/40 text-sm uppercase">Avg Word Count</p>
+                    <p className="text-white/40 text-xs lg:text-sm uppercase">Avg Word Count</p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-medium text-white mb-2">{report.avgIncidentLength}</div>
-                    <p className="text-white/40 text-sm uppercase">Avg Length</p>
+                  <div className="text-center lg:text-right">
+                    <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">{report.avgIncidentLength}</div>
+                    <p className="text-white/40 text-xs lg:text-sm uppercase">Avg Length</p>
                   </div>
                 </div>
               </div>
@@ -588,42 +596,43 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
         {/* Bottom divider animates when entering Section 4 */}
         <SectionDividerLine shouldAnimate={currentSection >= 3} position="bottom" />
         <div className="section-content !max-w-none w-full">
-          <div className="flex items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
-            {/* Left side - Stats (left-aligned, with responsive spacing) */}
-            <div className="flex-1 flex items-center justify-center pl-8 md:pl-16 lg:pl-24 pr-8">
-              <div className="text-left max-w-lg">
+          <div className="flex flex-col lg:flex-row items-stretch min-h-[70vh] w-full max-w-[1800px] mx-auto">
+            {/* Left side - Stats (centered on mobile, left-aligned on desktop) */}
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-16 lg:pr-8 py-8 lg:py-0 order-1">
+              <div className="text-center lg:text-left max-w-lg w-full">
                 <span className="section-label inline-block">Time Saved</span>
 
                 <div className="mb-4">
                   <span className="stat-number">
                     <AnimatedCounter value={timeSavedHours} />
                   </span>
-                  <span className="text-4xl md:text-6xl font-bold text-white/60 ml-4">hours</span>
+                  <span className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white/60 ml-2 sm:ml-4">hours</span>
                 </div>
 
-                <p className="section-subtitle text-left">
+                <p className="section-subtitle text-center lg:text-left">
                   Based on {report.minutesProcessed.toLocaleString()} minutes of footage processed
                 </p>
 
-                <p className="section-description text-left max-w-md">
+                <p className="section-description text-center lg:text-left max-w-md mx-auto lg:mx-0">
                   That&apos;s roughly <span className="text-white font-medium">{Math.round(timeSavedHours / 8)} full work days</span> your officers can spend back in the community.
                 </p>
 
-                <div className="mt-12 flex items-center gap-4 flex-wrap">
-                  <div className="stat-box">
-                    <div className="text-2xl font-medium text-white mb-1">
+                {/* Stats calculation - stacked on mobile, inline on desktop */}
+                <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 flex-wrap">
+                  <div className="stat-box w-full sm:w-auto">
+                    <div className="text-xl lg:text-2xl font-medium text-white mb-1">
                       {report.minutesProcessed.toLocaleString()}
                     </div>
                     <p className="text-white/40 text-xs uppercase">Minutes Processed</p>
                   </div>
-                  <div className="text-white/40 text-2xl">×</div>
-                  <div className="stat-box">
-                    <div className="text-2xl font-medium text-white mb-1">0.25</div>
+                  <div className="text-white/40 text-xl lg:text-2xl hidden sm:block">×</div>
+                  <div className="stat-box w-full sm:w-auto">
+                    <div className="text-xl lg:text-2xl font-medium text-white mb-1">0.25</div>
                     <p className="text-white/40 text-xs uppercase">Time Multiplier</p>
                   </div>
-                  <div className="text-white/40 text-2xl">=</div>
-                  <div className="stat-box--highlight">
-                    <div className="text-2xl font-medium text-white mb-1">
+                  <div className="text-white/40 text-xl lg:text-2xl hidden sm:block">=</div>
+                  <div className="stat-box--highlight w-full sm:w-auto">
+                    <div className="text-xl lg:text-2xl font-medium text-white mb-1">
                       {timeSavedMinutes.toLocaleString()} min
                     </div>
                     <p className="text-white/40 text-xs uppercase">Time Saved</p>
@@ -632,12 +641,19 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
               </div>
             </div>
             
-            {/* Vertical Divider - animate with small delay after horizontal lines */}
-            <VerticalDivider shouldAnimate={currentSection >= 2} delay={300} />
+            {/* Vertical Divider - hidden on mobile, visible on desktop */}
+            <div className="hidden lg:block">
+              <VerticalDivider shouldAnimate={currentSection >= 2} delay={300} />
+            </div>
+            
+            {/* Horizontal divider for mobile */}
+            <div className="lg:hidden w-full px-6 order-2">
+              <div className="h-[2px] bg-white/20 w-full" />
+            </div>
             
             {/* Right side - Three.js Wireframe (Time visualization - hourglass) */}
-            <div className="flex-1 flex items-center justify-center pl-8 pr-8 md:pr-16 lg:pr-24">
-              <div className="w-full max-w-lg h-[400px]">
+            <div className="flex-1 flex items-center justify-center px-6 lg:pl-8 lg:pr-16 py-8 lg:py-0 order-3">
+              <div className="w-full max-w-lg h-[280px] sm:h-[350px] lg:h-[400px]">
                 <Suspense fallback={<div className="w-full h-full bg-transparent" />}>
                   <TimeWireframe />
                 </Suspense>
@@ -651,22 +667,22 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       <section className="impact-section bg-black relative overflow-hidden">
         {/* Bottom divider animates when entering Section 5 */}
         <SectionDividerLine shouldAnimate={currentSection >= 4} position="bottom" />
-        <div className="section-content">
-          <div className="text-center mb-8">
+        <div className="section-content px-4 sm:px-6">
+          <div className="text-center mb-6 sm:mb-8">
             <span className="section-label">Report Locations</span>
 
-            <p className="section-description !mb-0 mt-4">
+            <p className="section-description text-base sm:text-xl !mb-0 mt-4">
               Geographic distribution of AI-generated reports during your trial
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <ReportLocationsMap locations={report.reportLocations} />
+            <ReportLocationsMapResponsive locations={report.reportLocations} />
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-8 flex-wrap">
+          <div className="mt-6 sm:mt-8 flex items-center justify-center gap-8 flex-wrap">
             <div className="text-center">
-              <div className="text-2xl font-medium text-white mb-1">
+              <div className="text-xl sm:text-2xl font-medium text-white mb-1">
                 <AnimatedCounter value={report.reportLocations.reduce((sum, loc) => sum + loc.count, 0)} />
               </div>
               <p className="text-white/40 text-xs uppercase">Total Incidents</p>
@@ -676,40 +692,40 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
       </section>
 
       {/* Section 5: Active Users & Leaderboard */}
-      <section className="impact-section pb-24 pt-16 bg-black relative overflow-hidden">
+      <section className="impact-section pb-16 sm:pb-24 pt-12 sm:pt-16 bg-black relative overflow-hidden">
         {/* No top divider - Section 4's bottom serves as the boundary */}
-        <div className="section-content">
-          <div className="text-center mb-12 mt-8">
+        <div className="section-content px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12 mt-4 sm:mt-8">
             <span className="section-label">Active Users</span>
 
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <span className="stat-number-sm">
                 <AnimatedCounter value={report.activeUsers} />
               </span>
             </div>
 
-            <p className="section-description !mb-0">
+            <p className="section-description text-base sm:text-xl !mb-0">
               Officers using Code Four during your trial
             </p>
           </div>
 
           <div ref={leaderboardRef} className="max-w-xl mx-auto">
-            <h3 className="text-white/60 text-sm uppercase tracking-wider mb-4 text-center">
+            <h3 className="text-white/60 text-xs sm:text-sm uppercase tracking-wider mb-3 sm:mb-4 text-center">
               Top Contributors
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {report.leaderboard.map((user, index) => {
                 const styles = getLeaderboardStyles(index);
                 return (
-                  <div key={user.name} className={`leaderboard-item ${styles.item} ${index === 0 ? 'relative' : ''}`}>
-                    <div className={`leaderboard-rank ${styles.rank}`}>#{user.rank}</div>
-                    <div className="flex-1">
-                      <div className="text-white font-medium">{user.name}</div>
+                  <div key={user.name} className={`leaderboard-item ${styles.item} ${index === 0 ? 'relative' : ''} p-3 sm:p-4`}>
+                    <div className={`leaderboard-rank ${styles.rank} text-sm sm:text-base`}>#{user.rank}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-medium text-sm sm:text-base truncate">{user.name}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-white font-bold text-xl">{user.reports}</div>
-                      <div className="text-white/40 text-xs uppercase">Reports</div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-white font-bold text-lg sm:text-xl">{user.reports}</div>
+                      <div className="text-white/40 text-[10px] sm:text-xs uppercase">Reports</div>
                     </div>
                   </div>
                 );
@@ -717,25 +733,25 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
             </div>
           </div>
 
-          <div className="mt-16 text-center">
-            <p className="text-white/60 mb-6">Ready to continue the momentum?</p>
-            <div className="flex flex-col items-center gap-4">
+          <div className="mt-12 sm:mt-16 text-center">
+            <p className="text-white/60 text-sm sm:text-base mb-4 sm:mb-6">Ready to continue the momentum?</p>
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
               <a
                 href="https://cal.com/codefour"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
+                className="btn-primary text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
               >
                 Schedule a Call
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-5 sm:h-5">
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </a>
               <button
                 onClick={() => window.print()}
-                className="text-white/50 hover:text-white text-sm uppercase tracking-wider transition-colors flex items-center gap-2"
+                className="text-white/50 hover:text-white text-xs sm:text-sm uppercase tracking-wider transition-colors flex items-center gap-2"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7 10 12 15 17 10"/>
                   <line x1="12" y1="15" x2="12" y2="3"/>
