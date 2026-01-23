@@ -35,6 +35,7 @@ export interface ImpactMetadata {
     trialPeriod: string;
     reportsGenerated: number;
     minutesProcessed: number;
+    totalMediaBytesProcessed?: number;  // Raw bytes from BigQuery total_media_size_bytes
     activeUsers: number;
     avgWordLength: number;
     avgIncidentLength: string;
