@@ -624,7 +624,7 @@ export function ImpactViewer({ data, hasPdf, org, uuid }: ImpactViewerProps) {
                   <span className="text-white font-medium">{avgReportsPerOfficer} reports</span> during your trial period.
                 </p>
 
-                <div className="mt-8 lg:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                <div className="mt-8 lg:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                   <div className="text-center lg:text-right">
                     <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">
                       <AnimatedCounter value={report.activeUsers} />
@@ -641,6 +641,14 @@ export function ImpactViewer({ data, hasPdf, org, uuid }: ImpactViewerProps) {
                     <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">{report.avgIncidentLength}</div>
                     <p className="text-white/40 text-xs lg:text-sm uppercase">Avg Length</p>
                   </div>
+                  {report.totalMediaBytesProcessed !== undefined && report.totalMediaBytesProcessed > 0 && (
+                    <div className="text-center lg:text-right">
+                      <div className="text-2xl lg:text-3xl font-medium text-white mb-1 lg:mb-2">
+                        {(report.totalMediaBytesProcessed / (1024 * 1024 * 1024)).toFixed(1)} GB
+                      </div>
+                      <p className="text-white/40 text-xs lg:text-sm uppercase">Media Processed</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
