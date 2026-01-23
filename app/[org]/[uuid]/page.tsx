@@ -9,7 +9,7 @@
 
 import { notFound } from 'next/navigation';
 import { cookies, headers } from 'next/headers';
-import { getImpactReportByOrgAndUuid, verifyImpactPassword } from '@/lib/services/gcs-impact.service';
+import { getImpactReportByOrgAndUuid, verifyImpactPassword, checkImpactPdfExists } from '@/lib/services/gcs-impact.service';
 import { checkRateLimit, validateUuid, validateOrgSlug } from '@/lib/security/validation';
 import { PasswordPrompt } from './password-prompt';
 import { ImpactViewer } from './impact-viewer';
@@ -82,8 +82,11 @@ export default async function ImpactPage({ params }: PageProps) {
       }
     }
     
-    // 3. Render impact viewer
-    return <ImpactViewer data={impactData} />;
+    // 3. Check if PDF exists for download button
+    const hasPdf = await checkImpactPdfExists(org, uuid);
+    
+    // 4. Render impact viewer with PDF availability and org/uuid for download action
+    return <ImpactViewer data={impactData} hasPdf={hasPdf} org={org} uuid={uuid} />;
     
   } catch (error) {
     console.error('[Impact Page] Error:', error);
