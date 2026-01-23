@@ -65,8 +65,10 @@ function ReportsVisualization({ mouseRef }: { mouseRef: React.MutableRefObject<{
       if (isTopPaper(paperIndex)) {
         const numTextLines = 4;
         const margin = 0.2;
+        const lineSpacing = 0.25; // Tighter spacing between lines
         for (let l = 0; l < numTextLines; l++) {
-          const yPos = -docHeight/2 + margin + (l * (docHeight - margin * 2) / (numTextLines));
+          // Start near top of page and go downward
+          const yPos = docHeight/2 - margin - (l * lineSpacing);
           const lineStartX = -docWidth/2 + margin;
           const lineEndX = docWidth/2 - margin - (l % 2 === 0 ? 0 : 0.3); // Varying line lengths
           
