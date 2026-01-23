@@ -9,6 +9,7 @@ import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ColorBends from '@/app/components/ColorBends';
 import { ImpactReportData } from '@/lib/services/gcs-impact.service';
+import { getPdfDownloadUrlAction } from './actions';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import confetti from 'canvas-confetti';
@@ -28,6 +29,9 @@ const TimeWireframe = dynamic(
 
 interface ImpactViewerProps {
   data: ImpactReportData;
+  hasPdf: boolean;
+  org: string;
+  uuid: string;
 }
 
 function AnimatedCounter({ value, duration = 2, suffix = '' }: { value: number, duration?: number, suffix?: string }) {
@@ -179,6 +183,53 @@ function triggerConfetti() {
       colors: colors,
     });
   }, 400);
+}
+
+// Download Report Button - calls server action to get signed URL and opens in new tab
+function DownloadReportButton({ org, uuid }: { org: string; uuid: string }) {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleDownload = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    try {
+      const result = await getPdfDownloadUrlAction(org, uuid);
+      
+      if (result.success && result.url) {
+        // Open PDF in new tab
+        window.open(result.url, '_blank', 'noopener,noreferrer');
+      } else {
+        console.error('[Download] Failed:', result.error);
+        // Could show a toast here, but for now just log
+      }
+    } catch (error) {
+      console.error('[Download] Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={isLoading}
+      className="text-white/50 hover:text-white text-xs sm:text-sm uppercase tracking-wider transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {isLoading ? (
+        <svg className="animate-spin sm:w-4 sm:h-4" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      )}
+      {isLoading ? 'Loading...' : 'Download Report'}
+    </button>
+  );
 }
 
 function ReportLocationsMapResponsive({ locations }: { locations: Array<{ lat: number; lon: number; count: number }> }) {
@@ -352,7 +403,7 @@ function ReportLocationsMapResponsive({ locations }: { locations: Array<{ lat: n
   );
 }
 
-export function ImpactViewer({ data }: ImpactViewerProps) {
+export function ImpactViewer({ data, hasPdf, org, uuid }: ImpactViewerProps) {
   const mainContainer = useRef<HTMLDivElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
   const [colorBendsOpacity, setColorBendsOpacity] = useState(1);
@@ -383,7 +434,8 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
   }, []);
 
   const report = data.metadata.report;
-  const timeSavedMinutes = Math.round(report.minutesProcessed * 0.25);
+  // Time saved calculation: 20 minutes per report generated
+  const timeSavedMinutes = report.reportsGenerated * 20;
   const timeSavedHours = Math.round(timeSavedMinutes / 60);
   const avgReportsPerOfficer = Math.round(report.reportsGenerated / report.activeUsers);
 
@@ -616,7 +668,7 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
                 </div>
 
                 <p className="section-subtitle text-center lg:text-left">
-                  Based on {report.minutesProcessed.toLocaleString()} minutes of footage processed
+                  Based on {report.reportsGenerated.toLocaleString()} reports generated
                 </p>
 
                 <p className="section-description text-center lg:text-left max-w-md mx-auto lg:mx-0">
@@ -627,21 +679,21 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
                 <div className="mt-8 lg:mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 flex-wrap">
                   <div className="stat-box w-full sm:w-auto">
                     <div className="text-xl lg:text-2xl font-medium text-white mb-1">
-                      {report.minutesProcessed.toLocaleString()}
+                      {report.reportsGenerated.toLocaleString()}
                     </div>
-                    <p className="text-white/40 text-xs uppercase">Minutes Processed</p>
+                    <p className="text-white/40 text-xs uppercase">Reports Generated</p>
                   </div>
                   <div className="text-white/40 text-xl lg:text-2xl hidden sm:block">×</div>
                   <div className="stat-box w-full sm:w-auto">
-                    <div className="text-xl lg:text-2xl font-medium text-white mb-1">0.25</div>
-                    <p className="text-white/40 text-xs uppercase">Time Multiplier</p>
+                    <div className="text-xl lg:text-2xl font-medium text-white mb-1">20 min</div>
+                    <p className="text-white/40 text-xs uppercase">Per Report</p>
                   </div>
                   <div className="text-white/40 text-xl lg:text-2xl hidden sm:block">=</div>
                   <div className="stat-box--highlight w-full sm:w-auto">
                     <div className="text-xl lg:text-2xl font-medium text-white mb-1">
                       {timeSavedMinutes.toLocaleString()} min
                     </div>
-                    <p className="text-white/40 text-xs uppercase">Time Saved</p>
+                    <p className="text-white/40 text-xs uppercase">Est. Time Saved</p>
                   </div>
                 </div>
               </div>
@@ -755,17 +807,9 @@ export function ImpactViewer({ data }: ImpactViewerProps) {
                   <path d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
               </a>
-              <button
-                onClick={() => window.print()}
-                className="text-white/50 hover:text-white text-xs sm:text-sm uppercase tracking-wider transition-colors flex items-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7 10 12 15 17 10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download Report
-              </button>
+              {hasPdf && (
+                <DownloadReportButton org={org} uuid={uuid} />
+              )}
             </div>
           </div>
         </div>
